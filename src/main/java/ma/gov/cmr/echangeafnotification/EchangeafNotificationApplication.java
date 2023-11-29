@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import ma.gov.cmr.echangeafnotification.dao.models.WsPasSuiviEntity;
 import ma.gov.cmr.echangeafnotification.dao.repositories.IWsPasSuiviRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +18,24 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @SpringBootApplication
-public class EchangeafNotificationApplication {
+public class EchangeafNotificationApplication implements CommandLineRunner {
 
     private IWsPasSuiviRepository wsPasSuiviRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(EchangeafNotificationApplication.class, args);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        List<WsPasSuiviEntity> wsPasSuiviEntityList = wsPasSuiviRepository.findAll();
+
+        if (wsPasSuiviEntityList.size() > 1000) {
+            wsPasSuiviEntityList = wsPasSuiviEntityList.subList(0, 1000);
+        }
+
+        exportToJson(wsPasSuiviEntityList);
     }
 
     @GetMapping("/")
